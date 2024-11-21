@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Форма запроса</title>
+  <style>
+    form {
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    label {
+      font-weight: bold;
+    }
+    #error-message {
+      color: red;
+      margin-bottom: 10px;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <form action="https://script.google.com/macros/s/AKfycbzZK3A1DnnJXLcpsUEprJHOKa4gRoF1TPuoFqY311EFxus4vO6yr_VHFjReIaPdTXMU6Q/exec" method="get" target="_blank" onsubmit="return validateForm(this);">
+    <input type="hidden" name="action" value="Set">
+    
+    <label for="ticket_id">Ссылка на тикет:</label><br>
+    <input type="text" id="ticket_id" name="p1" required><br><br>
+    
+    <label for="user_name">Имя саппорта:</label><br>
+    <input type="text" id="user_name" name="p2" required><br><br>
+    
+    <label for="manager_name">Имя ПО-менеджера:</label><br>
+    <select id="manager_name" name="p3" required>
+      <option value="">Выберите менеджера</option>
+      <option value="@laskeeva-ms">@laskeeva-ms</option>
+      <option value="@kirzhankova-ds">@kirzhankova-ds</option>
+      <option value="@krasnyanskaya-ag">@krasnyanskaya-ag</option>
+      <option value="@lisov-yn">@lisov-yn</option>
+      <option value="@plachinda-ag">@plachinda-ag</option>
+    </select><br><br>
+    
+    <label for="label">Лейбл:</label><br>
+    <input type="text" id="label" name="p4" required><br><br>
+    
+    <label for="release_link">Ссылка на релиз:</label><br>
+    <input type="text" id="release_link" name="p5" required><br><br>
+    
+    <label for="changes">Что нужно исправить:</label><br>
+    <textarea id="changes" name="p6" required></textarea><br><br>
+    
+    <div id="error-message" style="display: none;">Не заполнены все поля</div>
+    
+    <button type="submit">Отправить</button>
+  </form>
+
+  <script>
+    function validateForm(form) {
+      const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+      for (let input of inputs) {
+        if (!input.value) {
+          document.getElementById('error-message').style.display = 'block';
+          return false;
+        }
+      }
+      document.getElementById('error-message').style.display = 'none';
+
+      const formData = new FormData(form);
+      const queryString = new URLSearchParams(formData).toString();
+      const targetUrl = form.action + '?' + queryString;
+
+      const newWindow = window.open(targetUrl, '_blank');
+      if (newWindow) {
+        newWindow.opener = null;
+        newWindow.close();
+      }
+      return false;
+    }
+  </script>
+</body>
+</html>
