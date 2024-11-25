@@ -1,89 +1,105 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Форма запроса</title>
+  <title>Запрос на перенастройку</title>
   <style>
-    form {
+    body {
       font-family: Arial, sans-serif;
-      max-width: 400px;
-      margin: 0 auto;
+      margin: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
     }
     label {
-      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
     }
-    #error-message {
-      color: red;
-      margin-bottom: 10px;
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
     }
     button {
+      padding: 10px 20px;
       background-color: #007BFF;
       color: white;
       border: none;
-      padding: 10px 20px;
       cursor: pointer;
     }
     button:hover {
       background-color: #0056b3;
     }
+    .error {
+      color: red;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 <body>
-  <form action="https://script.google.com/macros/s/AKfycbzZK3A1DnnJXLcpsUEprJHOKa4gRoF1TPuoFqY311EFxus4vO6yr_VHFjReIaPdTXMU6Q/exec" method="get" target="_blank" onsubmit="return validateForm(this);">
-    <input type="hidden" name="action" value="Set">
-    
-    <label for="ticket_id">Ссылка на тикет:</label><br>
-    <input type="text" id="ticket_id" name="p1" required><br><br>
-    
-    <label for="user_name">Имя саппорта:</label><br>
-    <input type="text" id="user_name" name="p2" required><br><br>
-    
-    <label for="manager_name">Имя ПО-менеджера:</label><br>
-    <select id="manager_name" name="p3" required>
-      <option value="">Выберите менеджера</option>
-      <option value="@laskeeva-ms">@laskeeva-ms</option>
-      <option value="@kirzhankova-ds">@kirzhankova-ds</option>
-      <option value="@krasnyanskaya-ag">@krasnyanskaya-ag</option>
-      <option value="@lisov-yn">@lisov-yn</option>
-      <option value="@plachinda-ag">@plachinda-ag</option>
-    </select><br><br>
-    
-    <label for="label">Лейбл:</label><br>
-    <input type="text" id="label" name="p4" required><br><br>
-    
-    <label for="release_link">Ссылка на релиз:</label><br>
-    <input type="text" id="release_link" name="p5" required><br><br>
-    
-    <label for="changes">Что нужно исправить:</label><br>
-    <textarea id="changes" name="p6" required></textarea><br><br>
-    
-    <div id="error-message" style="display: none;">Не заполнены все поля</div>
-    
-    <button type="submit">Отправить</button>
+  <form id="requestForm">
+    <div class="error" id="errorMessage" style="display: none;">Не заполнены все поля</div>
+    <div class="form-group">
+      <label for="ticketId">Ссылка на тикет</label>
+      <input type="text" id="ticketId" name="p1" placeholder="Введите ссылку на тикет">
+    </div>
+    <div class="form-group">
+      <label for="supportName">Имя саппорта</label>
+      <input type="text" id="supportName" name="p2" placeholder="Введите имя саппорта">
+    </div>
+    <div class="form-group">
+      <label for="managerName">Имя ПО-менеджера</label>
+      <select id="managerName" name="p3">
+        <option value="">Выберите менеджера</option>
+        <option value="@laskeeva-ms">@laskeeva-ms</option>
+        <option value="@kirzhankova-ds">@kirzhankova-ds</option>
+        <option value="@krasnyanskaya-ag">@krasnyanskaya-ag</option>
+        <option value="@lisov-yn">@lisov-yn</option>
+        <option value="@plachinda-ag">@plachinda-ag</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="label">Лейбл</label>
+      <input type="text" id="label" name="p4" placeholder="Введите лейбл">
+    </div>
+    <div class="form-group">
+      <label for="releaseLink">Ссылка на релиз</label>
+      <input type="text" id="releaseLink" name="p5" placeholder="Введите ссылку на релиз">
+    </div>
+    <div class="form-group">
+      <label for="changes">Что нужно исправить</label>
+      <textarea id="changes" name="p6" rows="4" placeholder="Опишите изменения"></textarea>
+    </div>
+    <button type="button" onclick="submitForm()">Отправить</button>
   </form>
 
   <script>
-    function validateForm(form) {
-      const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-      for (let input of inputs) {
-        if (!input.value) {
-          document.getElementById('error-message').style.display = 'block';
-          return false;
-        }
-      }
-      document.getElementById('error-message').style.display = 'none';
+    function submitForm() {
+      const ticketId = document.getElementById("ticketId").value.trim();
+      const supportName = document.getElementById("supportName").value.trim();
+      const managerName = document.getElementById("managerName").value;
+      const label = document.getElementById("label").value.trim();
+      const releaseLink = document.getElementById("releaseLink").value.trim();
+      const changes = document.getElementById("changes").value.trim();
+      const errorMessage = document.getElementById("errorMessage");
 
-      const formData = new FormData(form);
-      const queryString = new URLSearchParams(formData).toString();
-      const targetUrl = form.action + '?' + queryString;
-
-      const newWindow = window.open(targetUrl, '_blank');
-      if (newWindow) {
-        newWindow.opener = null;
-        newWindow.close();
+      // Проверка заполненности полей
+      if (!ticketId || !supportName || !managerName || !label || !releaseLink || !changes) {
+        errorMessage.style.display = "block";
+        return;
       }
-      return false;
+
+      errorMessage.style.display = "none";
+
+      // Формирование GET-запроса
+      const url = `https://script.google.com/macros/s/AKfycbzZK3A1DnnJXLcpsUEprJHOKa4gRoF1TPuoFqY311EFxus4vO6yr_VHFjReIaPdTXMU6Q/exec` +
+        `?action=Set&p1=${encodeURIComponent(ticketId)}&p2=${encodeURIComponent(supportName)}&p3=${encodeURIComponent(managerName)}` +
+        `&p4=${encodeURIComponent(label)}&p5=${encodeURIComponent(releaseLink)}&p6=${encodeURIComponent(changes)}`;
+
+      // Открытие новой вкладки, отправка и закрытие
+      const newTab = window.open(url, "_blank");
+      setTimeout(() => newTab.close(), 1000); // Закрытие через 1 секунду
     }
   </script>
 </body>
