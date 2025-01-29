@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Запрос на перенастройку</title>
   <style>
+
+    #ticketIdError {
+  color: red;
+  margin-top: 5px;
+  display: none;
+}
+    
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
@@ -41,9 +48,10 @@
   <form id="requestForm">
     <div class="error" id="errorMessage" style="display: none;">Не заполнены все поля</div>
     <div class="form-group">
-      <label for="ticketId">ID тикета</label>
-      <input type="text" id="ticketId" name="p1" placeholder="Введите ссылку на тикет">
-    </div>
+  <label for="ticketId">ID тикета</label>
+  <input type="text" id="ticketId" name="p1" placeholder="Введите ID тикета">
+  <div class="error" id="ticketIdError" style="display: none;">Введи номер тикета из URL</div>
+</div>
     <div class="form-group">
       <label for="supportName">Имя саппорта</label>
       <input type="text" id="supportName" name="p2" placeholder="Введите имя саппорта">
@@ -75,32 +83,51 @@
   </form>
 
   <script>
-    function submitForm() {
-      const ticketId = document.getElementById("ticketId").value.trim();
-      const supportName = document.getElementById("supportName").value.trim();
-      const managerName = document.getElementById("managerName").value;
-      const label = document.getElementById("label").value.trim();
-      const releaseLink = document.getElementById("releaseLink").value.trim();
-      const changes = document.getElementById("changes").value.trim();
-      const errorMessage = document.getElementById("errorMessage");
+function validateTicketId() {
+  const ticketId = document.getElementById("ticketId").value.trim();
+  const ticketIdError = document.getElementById("ticketIdError");
 
-      // Проверка заполненности полей
-      if (!ticketId || !supportName || !managerName || !label || !releaseLink || !changes) {
-        errorMessage.style.display = "block";
-        return;
-      }
+  // Проверка, что введены только цифры
+  if (!/^\d+$/.test(ticketId)) {
+    ticketIdError.style.display = "block";
+    return false;
+  } else {
+    ticketIdError.style.display = "none";
+    return true;
+  }
+}
 
-      errorMessage.style.display = "none";
+function submitForm() {
+  const ticketId = document.getElementById("ticketId").value.trim();
+  const supportName = document.getElementById("supportName").value.trim();
+  const managerName = document.getElementById("managerName").value;
+  const label = document.getElementById("label").value.trim();
+  const releaseLink = document.getElementById("releaseLink").value.trim();
+  const changes = document.getElementById("changes").value.trim();
+  const errorMessage = document.getElementById("errorMessage");
 
-      // Формирование GET-запроса
-      const url = `https://script.google.com/macros/s/AKfycbzZK3A1DnnJXLcpsUEprJHOKa4gRoF1TPuoFqY311EFxus4vO6yr_VHFjReIaPdTXMU6Q/exec` +
-        `?action=Set&p1=${encodeURIComponent(ticketId)}&p2=${encodeURIComponent(supportName)}&p3=${encodeURIComponent(managerName)}` +
-        `&p4=${encodeURIComponent(label)}&p5=${encodeURIComponent(releaseLink)}&p6=${encodeURIComponent(changes)}`;
+  // Проверка заполненности полей
+  if (!ticketId || !supportName || !managerName || !label || !releaseLink || !changes) {
+    errorMessage.style.display = "block";
+    return;
+  }
 
-      // Открытие новой вкладки, отправка и закрытие
-      const newTab = window.open(url, "_blank");
-      setTimeout(() => newTab.close(), 1000); // Закрытие через 1 секунду
-    }
+  // Проверка валидности ID тикета
+  if (!validateTicketId()) {
+    return;
+  }
+
+  errorMessage.style.display = "none";
+
+  // Формирование GET-запроса
+  const url = `https://script.google.com/macros/s/AKfycbzZK3A1DnnJXLcpsUEprJHOKa4gRoF1TPuoFqY311EFxus4vO6yr_VHFjReIaPdTXMU6Q/exec` +
+    `?action=Set&p1=${encodeURIComponent(ticketId)}&p2=${encodeURIComponent(supportName)}&p3=${encodeURIComponent(managerName)}` +
+    `&p4=${encodeURIComponent(label)}&p5=${encodeURIComponent(releaseLink)}&p6=${encodeURIComponent(changes)}`;
+
+  // Открытие новой вкладки, отправка и закрытие
+  const newTab = window.open(url, "_blank");
+  setTimeout(() => newTab.close(), 1000); // Закрытие через 1 секунду
+}
   </script>
 </body>
 </html>
